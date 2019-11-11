@@ -1,11 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-use Yaklass\Logger;
-use Yaklass\Spider;
-use Yaklass\XpathReader;
-use Yaklass\StatsSqlStorage;
-
 $file = __DIR__;
 if (file_exists($file = __DIR__ . "/../../autoload.php")) {
   /** @noinspection PhpIncludeInspection */
@@ -19,65 +14,5 @@ else {
   die("Can't find autoload.php");
 }
 
-//
-// Get data from Yaklass
-//
-try {
-  $spider = new Spider("credentials.json");
-  $html = $spider->getTopPage();
-}
-catch (Exception $e) {
-  echo "Unable to fetch data:\n\t" . $e->getMessage();
-  exit(1);
-}
-unset($spider);
-//
-//$html = file_put_contents('1.html', $html);
-//exit(1);
+(new Yaklass\App())->run();
 
-//$html = file_get_contents('1.html');
-
-//
-// Parse data with XPath
-//
-$xp = new XPathReader($html);
-try {
-  $stats = [];
-  $students = $xp->getList("//div[@class='classmates-top']//div[@class='top-list']/div");
-  foreach ($students as $i => $student) {
-    $stats[] = [
-      'id' => preg_replace('~/profile/~', '', $xp->getAttr("div[@class='name']/a/@href", $student)),
-      'name' => $xp->getText("div[@class='name']/a", $student),
-      'points' => $xp->getText("div[@class='points']", $student),
-    ];
-  }
-} catch (Exception $e) {
-  echo "Error(s): " . $e->getMessage();
-  exit(1);
-}
-
-//
-// Save data to csv
-//
-try {
-  $storage = new StatsSqlStorage([
-    'driver' => 'pdo_sqlite',
-    'path' => 'stats.sqlite',
-  ], new Logger());
-  $storage->save($stats);
-
-} catch (Exception $e) {
-  echo "Error(s): " . $e->getMessage();
-  exit(1);
-}
-//$fname = 'stats_' . date('Y-m-d H_m_s') . '.csv';
-//$fp = fopen($fname, 'w');
-//$header = ['id', 'name', 'points'];
-//// Write header row
-//fputcsv($fp, array_combine($header, $header));
-//
-//foreach ($stats as $fields) {
-//  fputcsv($fp, $fields);
-//}
-//fclose($fp);
-//echo "Generated file: " . $fname;
