@@ -1,9 +1,10 @@
 #!/usr/bin/env php
 <?php
 
+use Yaklass\Logger;
 use Yaklass\Spider;
 use Yaklass\XpathReader;
-use Yaklass\StatsStorage;
+use Yaklass\StatsSqlStorage;
 
 $file = __DIR__;
 if (file_exists($file = __DIR__ . "/../../autoload.php")) {
@@ -21,20 +22,20 @@ else {
 //
 // Get data from Yaklass
 //
-//try {
-//  $spider = new Spider("credentials.json");
-//  $html = $spider->getTopPage();
-//}
-//catch (Exception $e) {
-//  echo "Unable to fetch data:\n\t" . $e->getMessage();
-//  exit(1);
-//}
-//unset($spider);
+try {
+  $spider = new Spider("credentials.json");
+  $html = $spider->getTopPage();
+}
+catch (Exception $e) {
+  echo "Unable to fetch data:\n\t" . $e->getMessage();
+  exit(1);
+}
+unset($spider);
 //
 //$html = file_put_contents('1.html', $html);
 //exit(1);
 
-$html = file_get_contents('1.html');
+//$html = file_get_contents('1.html');
 
 //
 // Parse data with XPath
@@ -59,8 +60,12 @@ try {
 // Save data to csv
 //
 try {
-  $storage = new StatsStorage();
+  $storage = new StatsSqlStorage([
+    'driver' => 'pdo_sqlite',
+    'path' => 'stats.sqlite',
+  ], new Logger());
   $storage->save($stats);
+
 } catch (Exception $e) {
   echo "Error(s): " . $e->getMessage();
   exit(1);
