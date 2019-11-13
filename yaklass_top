@@ -14,5 +14,5 @@ else {
   die("Can't find autoload.php");
 }
 
-(new Yaklass\App())->run();
+(new Yaklass\TaskRunner\App())->run();
 

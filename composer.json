@@ -33,7 +33,7 @@
       "Yaklass\\": "src/"
     },
     "files": [
-      "src/TaskSync.php"
+      "src/TaskRunner/TaskSync.php"
     ]
   }
 }

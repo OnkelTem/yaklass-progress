@@ -1,10 +1,9 @@
 <?php
 
-namespace Yaklass\Task;
+namespace Yaklass\TaskRunner;
 
 use Exception;
 use TaskRunner\Task;
-use Yaklass\App;
 use Yaklass\Logger;
 use Yaklass\Spider;
 use Yaklass\XpathReader;

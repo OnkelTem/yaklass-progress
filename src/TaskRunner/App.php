@@ -1,20 +1,16 @@
 <?php
 
-namespace Yaklass;
+namespace Yaklass\TaskRunner;
 
-use Exception;
 use TaskRunner\LoggerInterface;
 
 class App extends \TaskRunner\App {
-
-//  /** @var Manager */
-//  protected $manager;
 
   protected static $paramsMap = [
     'sync' => 'sync',
     'show' => 'show',
     'debug' => '--debug',
-    'help' => '--help'
+    'help' => '--help',
   ];
 
   /** @var LoggerInterface */
@@ -22,18 +18,7 @@ class App extends \TaskRunner\App {
 
   public function __construct($params = []) {
     parent::__construct($params);
-    try {
-      //$this->manager = new Manager($this->options, $this->logger);
-    }
-    catch(Exception $e) {
-      $this->logger()->err($e->getMessage());
-      die(1);
-    }
   }
-
-//  public function manager() {
-//    return $this->manager;
-//  }
 
   protected function getUsageDefinition() {
     return <<<TXT
