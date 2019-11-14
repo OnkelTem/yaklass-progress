@@ -98,7 +98,7 @@ the last invocation of the `sync` command.
 
 ## Workflow
 
-Add `yaklass_top sync` invocation to your **crontab** to get 
+Add `yaklass_top_sql sync` invocation to your **crontab** to get 
 the database updated regularly and automatically.
 
 ## TODO
