@@ -13,7 +13,7 @@
   "type": "package",
   "prefer-stable": true,
   "require": {
-    "facebook/webdriver": "1.7.1",
+    "facebook/webdriver": "dev-w3c-capabilitites@dev",
     "league/csv": "^9.4",
     "onkeltem/task-runner": "*",
     "doctrine/dbal": "^2.9",
