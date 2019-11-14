@@ -148,7 +148,7 @@ class StatsSqlStorage {
           'points' => $activity['points'],
         ];
       }
-      $this->logger->msg(json_encode($student_data, JSON_UNESCAPED_UNICODE));
+      echo json_encode($student_data, JSON_UNESCAPED_UNICODE);
     }
   }
 
