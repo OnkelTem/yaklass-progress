@@ -111,7 +111,7 @@ class StatsSqlStorage {
         $this->logger->debug("\tNot updated: no diff");
       }
     }
-    $this->logger->info(sprintf('New users: %d, New activities: %d', $counters['new'], $counters['updated']));
+    $this->logger->info('New users: {new}, New activities: {updated}', $counters);
   }
 
   /**
