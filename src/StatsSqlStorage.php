@@ -6,6 +6,7 @@ use PDO;
 use DateTime;
 use Exception;
 use TaskRunner\LoggerInterface;
+use TaskRunner\TaskRunnerException;
 
 class StatsSqlStorage {
 
@@ -88,6 +89,7 @@ class StatsSqlStorage {
         $counters['new']++;
       }
       else {
+        // TODO: Update user name
         $this->logger->debug("\tDB: true");
       }
       // Find all activities of this student
@@ -119,10 +121,35 @@ class StatsSqlStorage {
    */
   public function show() {
     $studentSelect = $this->db->getConnection()->createQueryBuilder()
-      ->select('student_id')
+      ->select('student_id', 'uuid', 'first_name', 'last_name')
       ->from(self::TABLE_STUDENT);
-    $result = $studentSelect->execute()->fetchAll(PDO::FETCH_ASSOC);
-    $a = $result;
+    $activitiesSelect = $this->db->getConnection()->createQueryBuilder()
+      ->select('activity_id, date, points')
+      ->from(self::TABLE_ACTIVITY)
+      ->where('student_id = ?');
+    $students = $studentSelect->execute()->fetchAll(PDO::FETCH_ASSOC);
+    if ($students === FALSE) {
+      throw new Exception("Can't select students data.");
+    }
+    if (!count($students)) {
+      throw new Exception("Database is empty. Run `sync` first.");
+    }
+    foreach($students as $student) {
+      //$this->logger->msg(json_encode($student);
+      $activitiesSelect->setParameter(0, $student['student_id']);
+      $activities = $activitiesSelect->execute()->fetchAll(PDO::FETCH_ASSOC);
+      if ($students === FALSE) {
+        throw new Exception("Can't select activities, student: $student[student_id] ($student[first_name] $student[first_name])");
+      }
+      $student_data = $student;
+      foreach($activities as $activity) {
+        $student_data['activities'][$activity['activity_id']] = [
+          'date' => $activity['date'],
+          'points' => $activity['points'],
+        ];
+      }
+      $this->logger->msg(json_encode($student_data, JSON_UNESCAPED_UNICODE));
+    }
   }
 
   protected function prepare($data) {
