@@ -17,6 +17,7 @@
     "league/csv": "^9.4",
     "onkeltem/task-runner": "*",
     "doctrine/dbal": "^2.9",
+    "psr/log": "^1.0.1",
     "ext-dom": "*",
     "ext-libxml": "*",
     "ext-json": "*",

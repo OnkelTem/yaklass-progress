@@ -5,8 +5,7 @@ namespace Yaklass;
 use PDO;
 use DateTime;
 use Exception;
-use TaskRunner\LoggerInterface;
-use TaskRunner\TaskRunnerException;
+use Psr\Log\LoggerInterface;
 
 class StatsSqlStorage {
 
@@ -112,7 +111,7 @@ class StatsSqlStorage {
         $this->logger->debug("\tNot updated: no diff");
       }
     }
-    $this->logger->msg(sprintf('New users: %d, New activities: %d', $counters['new'], $counters['updated']));
+    $this->logger->info(sprintf('New users: %d, New activities: %d', $counters['new'], $counters['updated']));
   }
 
   /**
@@ -135,7 +134,6 @@ class StatsSqlStorage {
       throw new Exception("Database is empty. Run `sync` first.");
     }
     foreach($students as $student) {
-      //$this->logger->msg(json_encode($student);
       $activitiesSelect->setParameter(0, $student['student_id']);
       $activities = $activitiesSelect->execute()->fetchAll(PDO::FETCH_ASSOC);
       if ($students === FALSE) {

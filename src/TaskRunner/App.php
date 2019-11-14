@@ -2,8 +2,6 @@
 
 namespace Yaklass\TaskRunner;
 
-use TaskRunner\LoggerInterface;
-
 class App extends \TaskRunner\App {
 
   protected static $paramsMap = [
@@ -13,9 +11,6 @@ class App extends \TaskRunner\App {
     'debug' => '--debug',
     'help' => '--help',
   ];
-
-  /** @var LoggerInterface */
-  protected $logger;
 
   public function __construct($params = []) {
     parent::__construct($params);

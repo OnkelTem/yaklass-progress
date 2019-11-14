@@ -5,7 +5,6 @@ namespace Yaklass\TaskRunner;
 use Exception;
 use TaskRunner\Task;
 use TaskRunner\TaskRunnerException;
-use Yaklass\Logger;
 use Yaklass\Spider;
 use Yaklass\XpathReader;
 use Yaklass\StatsSqlStorage;
