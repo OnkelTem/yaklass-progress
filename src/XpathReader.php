@@ -3,7 +3,9 @@
 namespace Yaklass;
 
 use DOMDocument;
+use DOMNodeList;
 use DomXPath;
+use Exception;
 
 class XpathReader {
 

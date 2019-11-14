@@ -10,7 +10,6 @@ use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Exception;
-use TaskRunner\LoggerInterface;
 
 class Spider {
 
@@ -46,9 +45,10 @@ class Spider {
       $options->addArguments(['headless']);
     }
     $capabilities = DesiredCapabilities::chrome();
+    /** @noinspection PhpDeprecationInspection */
     $capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
     $this->driver = RemoteWebDriver::create(self::CONNECT_LINE, $capabilities);
-    $this->driver->manage()->window()->maximize();
+    //$this->driver->manage()->window()->maximize();
   }
 
   /**
