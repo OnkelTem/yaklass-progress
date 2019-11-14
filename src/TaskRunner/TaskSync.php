@@ -4,6 +4,7 @@ namespace Yaklass\TaskRunner;
 
 use Exception;
 use TaskRunner\Task;
+use TaskRunner\TaskRunnerException;
 use Yaklass\Logger;
 use Yaklass\Spider;
 use Yaklass\XpathReader;
@@ -20,6 +21,7 @@ class TaskSync extends Task {
    * @throws Exception
    */
   public function run() {
+
     //
     // Get data from Yaklass
     //
@@ -28,16 +30,15 @@ class TaskSync extends Task {
       $html = $spider->getTopPage();
     }
     catch (Exception $e) {
-      echo "Unable to fetch data:\n\t" . $e->getMessage();
-      exit(1);
+      throw new TaskRunnerException("Unable to fetch data: " . $e->getMessage());
     }
     unset($spider);
 
     //
     // Parse data with XPath
     //
-    $xp = new XPathReader($html);
     try {
+      $xp = new XPathReader($html);
       $stats = [];
       $students = $xp->getList("//div[@class='classmates-top']//div[@class='top-list']/div");
       foreach ($students as $i => $student) {
@@ -48,8 +49,7 @@ class TaskSync extends Task {
         ];
       }
     } catch (Exception $e) {
-      echo "Error(s): " . $e->getMessage();
-      exit(1);
+      throw new TaskRunnerException("Error(s): " . $e->getMessage());
     }
 
     //
@@ -59,12 +59,11 @@ class TaskSync extends Task {
       $storage = new StatsSqlStorage([
         'driver' => 'pdo_sqlite',
         'path' => 'stats.sqlite',
-      ], new Logger());
+      ], $this->logger);
       $storage->save($stats);
 
     } catch (Exception $e) {
-      echo "Error(s): " . $e->getMessage();
-      exit(1);
+      throw new TaskRunnerException("Error(s): " . $e->getMessage());
     }
 
   }

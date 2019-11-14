@@ -5,6 +5,7 @@ namespace Yaklass;
 use PDO;
 use DateTime;
 use Exception;
+use TaskRunner\LoggerInterface;
 
 class StatsSqlStorage {
 
@@ -20,7 +21,7 @@ class StatsSqlStorage {
   /**
    * StatsSqlStorage constructor.
    * @param $options
-   * @param Logger $logger
+   * @param LoggerInterface $logger
    * @throws Exception
    */
   function __construct($options, $logger) {
