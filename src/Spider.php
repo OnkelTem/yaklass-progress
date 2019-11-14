@@ -10,6 +10,7 @@ use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Exception;
+use TaskRunner\LoggerInterface;
 
 class Spider {
 
@@ -23,9 +24,10 @@ class Spider {
   /**
    * YaklassSpider constructor.
    * @param $credentials_file
+   * @param bool $headless
    * @throws Exception
    */
-  function __construct($credentials_file) {
+  function __construct($credentials_file, $headless = FALSE) {
     if (!file_exists($credentials_file)) {
       throw new Exception('File not found: ' . $credentials_file);
     }
@@ -35,12 +37,14 @@ class Spider {
       throw new Exception('Cannot parse credentials file: ' . $credentials_file);
     }
     $this->credentials = $credentials;
-    $this->openWebsite();
+    $this->runBrowser($headless);
   }
 
-  function openWebsite() {
+  function runBrowser($headless) {
     $options = new ChromeOptions();
-    //$options->addArguments(['headless']);
+    if ($headless) {
+      $options->addArguments(['headless']);
+    }
     $capabilities = DesiredCapabilities::chrome();
     $capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
     $this->driver = RemoteWebDriver::create(self::CONNECT_LINE, $capabilities);

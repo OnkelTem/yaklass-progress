@@ -26,7 +26,7 @@ class TaskSync extends Task {
     // Get data from Yaklass
     //
     try {
-      $spider = new Spider("credentials.json");
+      $spider = new Spider("credentials.json", $this->options['headless']);
       $html = $spider->getTopPage();
     }
     catch (Exception $e) {
