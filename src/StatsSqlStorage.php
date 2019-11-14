@@ -9,8 +9,6 @@ use TaskRunner\LoggerInterface;
 
 class StatsSqlStorage {
 
-  CONST LOCALE = 'ru_RU';
-
   CONST TABLE_STUDENT = 'student';
   CONST TABLE_ACTIVITY = 'activity';
 
@@ -54,6 +52,7 @@ class StatsSqlStorage {
   }
 
   /**
+   * Saves data into DB
    * @param $data
    * @throws Exception
    */
@@ -112,6 +111,18 @@ class StatsSqlStorage {
       }
     }
     $this->logger->msg(sprintf('New users: %d, New activities: %d', $counters['new'], $counters['updated']));
+  }
+
+  /**
+   * Displays data from DB
+   * @throws Exception
+   */
+  public function show() {
+    $studentSelect = $this->db->getConnection()->createQueryBuilder()
+      ->select('student_id')
+      ->from(self::TABLE_STUDENT);
+    $result = $studentSelect->execute()->fetchAll(PDO::FETCH_ASSOC);
+    $a = $result;
   }
 
   protected function prepare($data) {
