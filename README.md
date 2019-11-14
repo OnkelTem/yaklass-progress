@@ -1,4 +1,4 @@
-# Yaklass TOP fetcher
+# Yaklass TOP - SQL fetcher
 
 * Switch to the russian version: [README.RU.md](README.RU.md)
 
@@ -6,8 +6,8 @@
 
 Simple PHP script for fetching students TOP data from [Yaklass](https://yaklass.ru).
 
-The result is saved into a CSV file (currently: `stats.csv`). 
-Subsequent invocations will update the file with incremental updates.
+The result is saved into [SQLite](https://sqlite.org/index.html) database. 
+Subsequent invocations will update the database with incremental updates.
 
 ## Why?
 
@@ -29,8 +29,8 @@ In order to use this package you need to install [Composer](https://getcomposer.
 Install this package and its dependencies:
 
 ```
-$ composer init --no-interaction -s dev --repository '{"type": "git", "url": "git@github.com:OnkelTem/yaklass_top.git"}'
-$ composer require onkeltem/yaklass_top
+$ composer init --no-interaction -s dev --repository '{"type": "git", "url": "git@github.com:OnkelTem/yaklass_top_sql.git"}'
+$ composer require onkeltem/yaklass_top_sql
 ```
 
 Install [Selenium](http://selenium-release.storage.googleapis.com/index.html) server 
@@ -60,30 +60,48 @@ Run Selenium server:
 $ vendor/bin/start.sh
 ```
 
-Run Yaklass TOP page fetcher:  
+Run Yaklass TOP page SQL fetcher:  
 
 ```
-$ vendor/bin/yaklass_top
+$ vendor/bin/yaklass_top_sql sync
 ```
 
-It creates a CSV file named `stats.csv` with the following structure:
+When running for the first time this will create a new SQLite 
+database in the project root - `stats.sqlite` and will populate
+it with the fetched data.
 
-| id | first_name | last_name | 2019-11-08 01:40:12 |
-|----|------------|-----------|--------------------:|
-| 749c2b76-1a... | Vladimir | Putin | 125 | 
-| 213b1a32-b5... | George | Bush | 76 | 
-| ... | 
-
-The last column contains user's points and its name is
-the current date and time.
+To see the data currently stored in the DB use `show` command:
  
-Every time when you run the script again, it adds a new column with the number
-of points gained by the users since the previous invocation:
+```
+$ vendor/bin/yaklass_top_sql show
+```
 
-| id | first_name | last_name | 2019-11-08 01:40:12 | 2019-11-08 01:40:12 |
-|----|------------|-----------|--------------------:|--------------------:|
-| 749c2b76-1a... | Vladimir | Putin | 125 | 12 |
-| 213b1a32-b5... | George | Bush | 76 | 18 |
-| ... | 
+It will prints the data in JSON format, allowing for further processing (e.g. with 
+[jq](https://stedolan.github.io/jq/)).
 
-Thus, to get the total number of points just sum up values in a row.   
+Since this is a regular SQLite database, you can also use 
+[SQLite Database Browser](https://sqlitebrowser.org/) or any other appropriate tool
+which supports SQLite 3 databases.
+
+With the subsequent runs `sync` will update the database with the new information
+about students activities, if there were any.
+
+## Database
+
+The database has contains tables: `student` and `activity`.
+
+The `student` table stores brief student information - Yaklass student's UUID 
+and the name.
+
+The `activity` table stores student's activities measured since 
+the last invocation of the `sync` command.  
+
+## Workflow
+
+Add `yaklass_top sync` invocation to your **crontab** to get 
+the database updated regularly and automatically.
+
+## TODO
+
+* Enable `headless` mode of the PHP Webdriver to allow for cron-processing :)
+* Add reporting capabilities (e.g. save to CSV)   
