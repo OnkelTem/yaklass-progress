@@ -21,7 +21,7 @@ class Spider {
   private $credentials;
 
   /**
-   * YaklassSpider constructor.
+   * Yaklass Spider constructor.
    * @param $credentials_file
    * @param bool $headless
    * @throws Exception
@@ -39,6 +39,9 @@ class Spider {
     $this->runBrowser($headless);
   }
 
+  /**
+   * @param $headless
+   */
   function runBrowser($headless) {
     $options = new ChromeOptions();
     if ($headless) {
