@@ -27,8 +27,8 @@
 Установить пакет и его зависимости:
 
 ```
-$ composer init --no-interaction -s dev --repository '{"type": "git", "url": "git@github.com:OnkelTem/yaklass_top_sql.git"}'
-$ composer require onkeltem/yaklass_top_sql
+$ composer init --no-interaction -s dev --repository '{"type": "git", "url": "git@github.com:OnkelTem/yaklass-top-sql.git"}'
+$ composer require onkeltem/yaklass-top-sql
 ```
 
 Установите сервер [Selenium](http://selenium-release.storage.googleapis.com/index.html) 
@@ -61,7 +61,7 @@ $ vendor/bin/start.sh
 Запустите скрипт:
 
 ```
-$ vendor/bin/yaklass_top_sql sync 
+$ vendor/bin/yaklass-top-sql sync 
 ```
 
 При первом запуске будет создана БД в корне проекта - `stats.sqlite` и заполнена 
@@ -70,7 +70,7 @@ $ vendor/bin/yaklass_top_sql sync
 Чтобы посмотреть данные в базе, выполните команду `show`:
  
 ```
-$ vendor/bin/yaklass_top_sql show
+$ vendor/bin/yaklass-top-sql show
 ```
 
 Будет выведен список в формате JSON, который можно уже дальше расковыривать с помощью 
@@ -93,7 +93,7 @@ $ vendor/bin/yaklass_top_sql show
 
 ## Workflow
 
-Предполагается, что `yaklass_top_sql sync` будет добавлен в **crontab** с каким-то разумным 
+Предполагается, что `yaklass-top-sql sync` будет добавлен в **crontab** с каким-то разумным 
 периодом перезапуска (например раз в час) чтобы база обновлялась регулярно и сама.
 Но сейчас это работать не будет, так как я ещё не добавил `headless` режим для PHP WebDriver.
 

@@ -29,8 +29,8 @@ In order to use this package you need to install [Composer](https://getcomposer.
 Install this package and its dependencies:
 
 ```
-$ composer init --no-interaction -s dev --repository '{"type": "git", "url": "git@github.com:OnkelTem/yaklass_top_sql.git"}'
-$ composer require onkeltem/yaklass_top_sql
+$ composer init --no-interaction -s dev --repository '{"type": "git", "url": "git@github.com:OnkelTem/yaklass-top-sql.git"}'
+$ composer require onkeltem/yaklass-top-sql
 ```
 
 Install [Selenium](http://selenium-release.storage.googleapis.com/index.html) server 
@@ -63,7 +63,7 @@ $ vendor/bin/start.sh
 Run Yaklass TOP page SQL fetcher:  
 
 ```
-$ vendor/bin/yaklass_top_sql sync
+$ vendor/bin/yaklass-top-sql sync
 ```
 
 When running for the first time this will create a new SQLite 
@@ -73,7 +73,7 @@ it with the fetched data.
 To see the data currently stored in the DB use `show` command:
  
 ```
-$ vendor/bin/yaklass_top_sql show
+$ vendor/bin/yaklass-top-sql show
 ```
 
 It will prints the data in JSON format, allowing for further processing (e.g. with 
@@ -98,7 +98,7 @@ the last invocation of the `sync` command.
 
 ## Workflow
 
-Add `yaklass_top_sql sync` invocation to your **crontab** to get 
+Add `yaklass-top-sql sync` invocation to your **crontab** to get 
 the database updated regularly and automatically.
 
 ## TODO
