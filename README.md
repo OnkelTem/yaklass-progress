@@ -18,8 +18,6 @@ I personally would like to run a sort of sprints with some reward at the end
 to motivate students to constantly repeat and nail down when they learn. 
 Because as the saying goes: *"repetitio est mater studiorum."*
 
-Wanna discuss? Contact me: aneganov@gmail.com 
-
 ## Prerequisites
 
 In order to use this package you need to install [Composer](https://getcomposer.org/).
@@ -98,10 +96,30 @@ the last invocation of the `sync` command.
 
 ## Workflow
 
-Add `yaklass-top-sql sync` invocation to your **crontab** to get 
-the database updated regularly and automatically.
+Since the idea of the script is to get incremental updates, you want to 
+run this command regularly. One way to achieve that is using cron. For example:
+
+```
+@hourly cd /path/to/project/ && ./vendor/bin/start.sh && ./vendor/bin/yaklass-top-sql --headless sync; ./vendor/bin/stop.sh >> ./cron.log
+```
+
+This defines that, every hour cron will be:
+ 
+* switching to your project dir,
+* starting Selenium server,
+* running the `sync` command with the `--headless` option, 
+* stopping the server,
+* writing the output to the `cron.log` file in the project dir.
+
+So your database you will be updated hourly.
 
 ## TODO
 
-* Enable `headless` mode of the PHP Webdriver to allow for cron-processing :)
-* Add reporting capabilities (e.g. save to CSV)   
+* ~~Enable `headless` mode of the PHP Webdriver to allow for cron-processing :)~~
+* Add reporting capabilities (e.g. save/export to CSV)   
+
+## Contact
+
+If you have some ideas or questions - feel free to create tickets in the [issues queue](issues ) 
+or write me directly: aneganov@gmail.com.
+
