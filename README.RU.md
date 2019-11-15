@@ -94,7 +94,7 @@ $ vendor/bin/yaklass-top-sql show
 запускать скрипт регулярно, с чем легко справится тот же крон. Пример:
   
 ```
-@hourly cd /path/to/project/ && ./vendor/bin/start.sh && ./vendor/bin/yaklass-top-sql --headless sync; ./vendor/bin/stop.sh >> ./cron.log
+@hourly cd /projects/custom/yaklass/yaklass_sql/ && ./vendor/bin/start.sh && ./vendor/bin/yaklass-top-sql --headless sync >> cron.log 2>&1; ./vendor/bin/stop.sh
 ```
 
 То есть, каждый час крон будет:

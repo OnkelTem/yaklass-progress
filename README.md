@@ -100,7 +100,7 @@ Since the idea of the script is to get incremental updates, you want to
 run this command regularly. One way to achieve that is using cron. For example:
 
 ```
-@hourly cd /path/to/project/ && ./vendor/bin/start.sh && ./vendor/bin/yaklass-top-sql --headless sync; ./vendor/bin/stop.sh >> ./cron.log
+@hourly cd /projects/custom/yaklass/yaklass_sql/ && ./vendor/bin/start.sh && ./vendor/bin/yaklass-top-sql --headless sync >> cron.log 2>&1; ./vendor/bin/stop.sh
 ```
 
 This defines that, every hour cron will be:
