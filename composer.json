@@ -25,7 +25,7 @@
     "ext-pdo": "*"
   },
   "bin": [
-    "yaklass_top_sql",
+    "yaklass-top-sql",
     "scripts/install.sh",
     "scripts/start.sh"
   ],
