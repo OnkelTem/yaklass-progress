@@ -36,7 +36,7 @@ and [Chromedriver](https://sites.google.com/a/chromium.org/chromedriver/download
 the provided install script:
 
 ```
-$ vendor/bin/install.sh
+$ vendor/bin/yaklass-ts-install.sh
 ```
 
 Create `credentials.json` file with your Yaklass username and password:
@@ -55,13 +55,13 @@ You need to have at least one kid configured in Yaklass to access TOP page infor
 Run Selenium server:
 
 ```
-$ vendor/bin/start.sh
+$ vendor/bin/yaklass-ts-start.sh
 ```
 
 Run Yaklass TOP page SQL fetcher:  
 
 ```
-$ vendor/bin/yaklass-top-sql sync
+$ vendor/bin/yaklass-ts sync
 ```
 
 When running for the first time this will create a new SQLite 
@@ -71,7 +71,7 @@ it with the fetched data.
 To see the data currently stored in the DB use `show` command:
  
 ```
-$ vendor/bin/yaklass-top-sql show
+$ vendor/bin/yaklass-ts show
 ```
 
 It will prints the data in JSON format, allowing for further processing (e.g. with 
@@ -100,7 +100,7 @@ Since the idea of the script is to get incremental updates, you want to
 run this command regularly. One way to achieve that is using cron. For example:
 
 ```
-@hourly cd /projects/custom/yaklass/yaklass_sql/ && ./vendor/bin/start.sh && ./vendor/bin/yaklass-top-sql --headless sync >> cron.log 2>&1; ./vendor/bin/stop.sh
+@hourly cd /path/to/project && ./vendor/bin/yaklass-ts-start.sh && ./vendor/bin/yaklass-ts --headless sync >> cron.log 2>&1; ./vendor/bin/yaklass-ts-stop.sh
 ```
 
 This defines that, every hour cron will be:

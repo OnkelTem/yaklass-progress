@@ -146,7 +146,7 @@ class StatsSqlStorage {
           'points' => $activity['points'],
         ];
       }
-      echo json_encode($student_data, JSON_UNESCAPED_UNICODE);
+      echo json_encode($student_data, JSON_UNESCAPED_UNICODE) . "\n";
     }
   }
 

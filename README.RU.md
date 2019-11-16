@@ -52,13 +52,13 @@ $ vendor/bin/install.sh
 Запустите сервер Selenium:
 
 ```
-$ vendor/bin/start.sh
+$ vendor/bin/yaklass-ts-start.sh
 ```
 
 Запустите скрипт:
 
 ```
-$ vendor/bin/yaklass-top-sql sync 
+$ vendor/bin/yaklass-ts sync 
 ```
 
 При первом запуске будет создана БД в корне проекта - `stats.sqlite` и заполнена 
@@ -67,7 +67,7 @@ $ vendor/bin/yaklass-top-sql sync
 Чтобы посмотреть данные в базе, выполните команду `show`:
  
 ```
-$ vendor/bin/yaklass-top-sql show
+$ vendor/bin/yaklass-ts show
 ```
 
 Будет выведен список в формате JSON, который можно уже дальше расковыривать с помощью 
@@ -94,7 +94,7 @@ $ vendor/bin/yaklass-top-sql show
 запускать скрипт регулярно, с чем легко справится тот же крон. Пример:
   
 ```
-@hourly cd /projects/custom/yaklass/yaklass_sql/ && ./vendor/bin/start.sh && ./vendor/bin/yaklass-top-sql --headless sync >> cron.log 2>&1; ./vendor/bin/stop.sh
+@hourly cd /path/to/project && ./vendor/bin/yaklass-ts-start.sh && ./vendor/bin/yaklass-ts --headless sync >> cron.log 2>&1; ./vendor/bin/yaklass-ts-stop.sh
 ```
 
 То есть, каждый час крон будет:

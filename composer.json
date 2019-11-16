@@ -1,6 +1,5 @@
 {
   "name": "onkeltem/yaklass-top-sql",
-  "version": "0.1",
   "description": "Yaklass TOP-page data SQL fetcher",
   "license": "LGPL-3.0-or-later",
   "authors": [
@@ -26,9 +25,10 @@
     "ext-pdo": "*"
   },
   "bin": [
-    "yaklass-top-sql",
-    "scripts/install.sh",
-    "scripts/start.sh"
+    "bin/yaklass-ts",
+    "bin/yaklass-ts-install.sh",
+    "bin/yaklass-ts-start.sh",
+    "bin/yaklass-ts-stop.sh"
   ],
   "autoload": {
     "psr-4": {

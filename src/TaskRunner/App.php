@@ -21,7 +21,7 @@ class App extends \TaskRunner\App {
 Yaklass TOP sql data fetcher
 
 Usage:
-  yaklass_top_sql (sync | show) [--headless] [--debug] [--help] 
+  yaklass-ts (sync | show) [--headless] [--debug] [--help] 
 
 Commands:
   sync                   Synchronize data with Yaklass TOP rating page.
