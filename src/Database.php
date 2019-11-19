@@ -4,7 +4,9 @@ namespace Yaklass;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Table;
 use Exception;
 
@@ -72,4 +74,33 @@ class Database {
       throw new Exception("Cannot create database: " . $e->getMessage());
     }
   }
+
+  /**
+   * @param $fields
+   * @param $from
+   * @param null $where
+   * @param bool $execute
+   * @return Statement|QueryBuilder|int
+   * @throws Exception
+   */
+  public function select($fields, $from, $where = NULL, $execute = FALSE) {
+    try {
+      $qb = $this->getConnection()->createQueryBuilder();
+      $qb->select($fields);
+      $qb->from($from);
+      if ($where) {
+        $qb->where($where);
+      }
+      if ($execute) {
+        return $qb->execute();
+      }
+      else {
+        return $qb;
+      }
+    }
+    catch (Exception $e) {
+      throw new Exception($e->getMessage());
+    }
+  }
+
 }

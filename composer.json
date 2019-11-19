@@ -16,13 +16,15 @@
     "facebook/webdriver": "^1.7.1",
     "league/csv": "^9.4",
     "onkeltem/task-runner": "dev-master",
+    "google/apiclient": "^2.0",
     "doctrine/dbal": "^2.9",
     "psr/log": "^1.0.1",
     "ext-dom": "*",
     "ext-libxml": "*",
     "ext-json": "*",
     "ext-intl": "*",
-    "ext-pdo": "*"
+    "ext-pdo": "*",
+    "ext-mbstring": "*"
   },
   "bin": [
     "bin/yaklass-ts",
@@ -35,8 +37,10 @@
       "Yaklass\\": "src/"
     },
     "files": [
-      "src/TaskRunner/TaskSync.php",
-      "src/TaskRunner/TaskShow.php"
+      "src/TaskSync.php",
+      "src/TaskList.php",
+      "src/TaskTestLoad.php",
+      "src/TaskPublish.php"
     ]
   }
 }

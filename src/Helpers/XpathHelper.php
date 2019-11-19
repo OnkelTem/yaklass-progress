@@ -1,13 +1,13 @@
 <?php
 
-namespace Yaklass;
+namespace Yaklass\Helpers;
 
 use DOMDocument;
 use DOMNodeList;
 use DomXPath;
 use Exception;
 
-class XpathReader {
+class XpathHelper {
 
   protected $xpath;
 

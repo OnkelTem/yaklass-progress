@@ -8,4 +8,5 @@ cd "$dir" || exit 1
   pid=$(<selenium.lock)
   kill -9 "$pid"
   rm selenium.lock
+  echo "Selenium server is stopped."
 }

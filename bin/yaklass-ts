@@ -9,4 +9,4 @@ else {
   die("Can't find 'autoload.php'.\nThis script must be launched from 'vendor/bin/'");
 }
 
-(new Yaklass\TaskRunner\App())->run();
+(new Yaklass\App())->run();

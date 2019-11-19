@@ -7,7 +7,7 @@ use DateTime;
 use Exception;
 use Psr\Log\LoggerInterface;
 
-class StatsSqlStorage {
+class Storage {
 
   CONST TABLE_STUDENT = 'student';
   CONST TABLE_ACTIVITY = 'activity';
@@ -118,7 +118,7 @@ class StatsSqlStorage {
    * Displays data from DB
    * @throws Exception
    */
-  public function show() {
+  public function get() {
     $studentSelect = $this->db->getConnection()->createQueryBuilder()
       ->select('student_id', 'uuid', 'first_name', 'last_name')
       ->from(self::TABLE_STUDENT);
@@ -133,6 +133,7 @@ class StatsSqlStorage {
     if (!count($students)) {
       throw new Exception("Database is empty. Run `sync` first.");
     }
+    $result = [];
     foreach($students as $student) {
       $activitiesSelect->setParameter(0, $student['student_id']);
       $activities = $activitiesSelect->execute()->fetchAll(PDO::FETCH_ASSOC);
@@ -146,8 +147,9 @@ class StatsSqlStorage {
           'points' => $activity['points'],
         ];
       }
-      echo json_encode($student_data, JSON_UNESCAPED_UNICODE) . "\n";
+      $result[] = $student_data;
     }
+    return $result;
   }
 
   protected function prepare($data) {
@@ -182,6 +184,71 @@ class StatsSqlStorage {
       }
       $result[] = $res[0];
       $result[] = count($res) == 2 ? $res[1] : $res[2];
+    }
+    return $result;
+  }
+
+  /**
+   * @param array $activities
+   * @throws Exception
+   */
+  public function addActivities(array $activities) {
+    $student_id = 1;
+    foreach($activities as $activity) {
+      $this->db->getConnection()->insert(self::TABLE_ACTIVITY, [
+        'student_id' => $student_id,
+        'points' => $activity['points'],
+        'date' => $activity['date'],
+      ], [
+        PDO::PARAM_INT,
+        PDO::PARAM_INT,
+        'datetime'
+      ]);
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  public function getPeriod() {
+    $stmt = $this->db->select('min(date), max(date)', self::TABLE_ACTIVITY, NULL, TRUE);
+    $res = $stmt->fetch();
+    return array_values($res);
+  }
+
+  /**
+   * @throws Exception
+   */
+  public function getStudentsWithTotals() {
+    $total_query = $this->db->select('sum(points)', self::TABLE_ACTIVITY, 'student_id = ?');
+    $stmt = $this->db->select('student_id, first_name, last_name', self::TABLE_STUDENT)->execute();
+    $result = [];
+    foreach($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+      $student_id = array_shift($row);
+      $row['total'] = intval($total_query->setParameter(0, $student_id)->execute()->fetchColumn() ?: 0);
+      $result[$student_id] = $row;
+    }
+    return $result;
+  }
+
+  /**
+   * @throws Exception
+   */
+  public function getActivitiesTree() {
+    $stmt = $this->db->select('date, student_id, points', self::TABLE_ACTIVITY, FALSE)->orderBy('date')->execute();
+    $result = [];
+    $last_date = NULL;
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+      $date = array_shift($row);
+      $d = new DateTime($date);
+      $d->setTime(0, 0);
+      if (!array_key_exists($d->getTimestamp(), $result)) {
+        $result[$d->getTimestamp()] = [];
+      }
+      if (!array_key_exists($row['student_id'], $result[$d->getTimestamp()])) {
+        $result[$d->getTimestamp()][$row['student_id']] = 0;
+      }
+      $result[$d->getTimestamp()][$row['student_id']] += $row['points'];
     }
     return $result;
   }

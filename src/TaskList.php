@@ -1,30 +1,31 @@
 <?php
 
-namespace Yaklass\TaskRunner;
+namespace Yaklass;
 
 use Exception;
 use TaskRunner\Task;
 use TaskRunner\TaskRunnerException;
-use Yaklass\StatsSqlStorage;
 
 /**
  * @property App $app
  */
-class TaskShow extends Task {
+class TaskList extends Task {
 
-  protected static $taskId = 'show';
+  protected static $taskId = 'list';
 
   /**
    * @throws Exception
    */
   public function run() {
     try {
-      $storage = new StatsSqlStorage([
+      $storage = new Storage([
         'driver' => 'pdo_sqlite',
         'path' => 'stats.sqlite',
       ], $this->logger);
-      $storage->show();
-
+      $data = $storage->get();
+      foreach($data as $row) {
+        echo json_encode($row, JSON_UNESCAPED_UNICODE) . "\n";
+      }
     } catch (Exception $e) {
       throw new TaskRunnerException("Error(s): " . $e->getMessage());
     }

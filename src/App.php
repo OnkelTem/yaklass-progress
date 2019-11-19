@@ -1,19 +1,35 @@
 <?php
 
-namespace Yaklass\TaskRunner;
+namespace Yaklass;
+
+use Exception;
 
 class App extends \TaskRunner\App {
 
+  const CONFIG_FILE = 'config.json';
+
   protected static $paramsMap = [
     'sync' => 'sync',
-    'show' => 'show',
+    'list' => 'list',
+    'publish' => 'publish',
+    'testload' => 'testload',
     'headless' => '--headless',
     'debug' => '--debug',
     'help' => '--help',
   ];
+  /**
+   * @var void
+   */
 
   public function __construct($params = []) {
     parent::__construct($params);
+    try {
+      $this->options['config'] = Utils::readJSON(self::CONFIG_FILE);
+    }
+    catch(Exception $e) {
+      $this->logger->error($e->getMessage());
+      die(1);
+    }
   }
 
   protected function getUsageDefinition() {
@@ -21,11 +37,13 @@ class App extends \TaskRunner\App {
 Yaklass TOP sql data fetcher
 
 Usage:
-  yaklass-ts (sync | show) [--headless] [--debug] [--help] 
+  yaklass-ts (sync [--headless] | list | publish | testload) [--debug] [--help] 
 
 Commands:
   sync                   Synchronize data with Yaklass TOP rating page.
-  show                   Show stored information
+  list                   List stored information in JSON format.
+  publish                Publish statistics in a Google spreadsheet.
+  testload               TEMPORARY: Load test csv data
 
 Options:
   --headless             Suppress opening the web browser. Use for invocations from cron. 

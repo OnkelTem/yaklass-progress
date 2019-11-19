@@ -9,4 +9,5 @@ cd "$dir" || exit 1
   pid=$!
   echo $pid > selenium.lock
   sleep 10s
+  echo "Selenium server is running."
 }
