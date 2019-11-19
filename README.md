@@ -1,6 +1,6 @@
 # Yaklass TOP - SQL fetcher
 
-* Switch to the russian version: [README.RU.md](README.RU.md)
+* Switch to the russian version: [README.ru.md](README.ru.md)
 
 ## Description
 
