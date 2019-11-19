@@ -176,6 +176,6 @@ $ vendor/bin/yaklass-ts publish
 
 ## Contact
 
-Идеи, предложения? Добро пожаловать в [issues](issues). Или пишите, обсудим: aneganov@gmail.com. 
+Идеи, предложения? Добро пожаловать в **Issues**. Или пишите, обсудим: aneganov@gmail.com. 
  
 

@@ -184,5 +184,5 @@ The second line publishes the data.
 
 ## Contact
 
-If you have some ideas or questions - feel free to create tickets in the [issues queue](issues) 
+If you have some ideas or questions - feel free to create tickets in the **Issues** 
 or write me directly: aneganov@gmail.com.
