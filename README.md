@@ -176,7 +176,7 @@ and is selected by the `--sort=FIELD` option.
 
 ## Database structure
 
-The database has contains tables: `student` and `activity`.
+The database is plain simple and contains just two tables: `student` and `activity`.
 
 The `student` table stores a brief student information - Yaklass student's UUID 
 and the name.
