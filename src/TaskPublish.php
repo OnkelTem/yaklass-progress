@@ -26,6 +26,11 @@ class TaskPublish extends Task {
    * @var array
    */
   private $namesSeen = [];
+  private $dateFormatters = [];
+  /**
+   * @var string
+   */
+  private $sort;
 
   /**
    * @throws Exception
@@ -34,6 +39,10 @@ class TaskPublish extends Task {
     if (is_null($this->options['config']['publish'])) {
       throw new TaskRunnerException("Section is missed in the config: 'publish'");
     }
+    if (!in_array($this->options['sort'], ['name', 'total', 'checkpoint'])) {
+      throw new TaskRunnerException("Unknown sorting option: {$this->options['sort']}");
+    }
+    $this->sort = $this->options['sort'];
     try {
       $storage = new Storage([
         'driver' => 'pdo_sqlite',
@@ -156,10 +165,26 @@ class TaskPublish extends Task {
       $sheet_title,
       'weekend',
       [
-        'backgroundColor' => [
-          'red' => 1,
-          'green' => 0.95,
-          'blue' => 0.95
+        'backgroundColor' => $gsh->getColor('#fce6ce'),
+      ],
+      $class_clusters,
+      $gsh);
+    $this->addFormatByClass(
+      $sheet_title,
+      'checkpoint',
+      [
+        'backgroundColor' => $gsh->getColor('#daebd4'),
+      ],
+      $class_clusters,
+      $gsh);
+    $this->addFormatByClass(
+      $sheet_title,
+      ['name' => 'name', 'total' => 'total', 'checkpoint' => 'last-checkpoint'][$this->sort],
+      [
+        'textFormat' => [
+          'fontSize' => 8,
+          'fontFamily' => 'Calibri',
+          'bold' => true,
         ],
       ],
       $class_clusters,
@@ -335,19 +360,30 @@ class TaskPublish extends Task {
 
   /**
    * @param DateTimeInterface $date
+   * @param $format
+   * @return IntlDateFormatter
+   */
+  protected function formatDate($date, $format) {
+    if (!array_key_exists($format, $this->dateFormatters)) {
+      $this->dateFormatters[$format] = new IntlDateFormatter(
+        $this->options['config']['publish']['locale'],
+        IntlDateFormatter::SHORT,
+        IntlDateFormatter::SHORT,
+        $date->getTimezone()->getName(),
+        IntlDateFormatter::GREGORIAN,
+        $format
+      );
+    }
+    return $this->dateFormatters[$format]->format($date);
+  }
+
+  /**
+   * @param DateTimeInterface $date
    * @return array
    * @see http://userguide.icu-project.org/formatparse/datetime
    */
   protected function datePartCells($date) {
-    $formatter = new IntlDateFormatter(
-      $this->options['config']['publish']['locale'],
-      IntlDateFormatter::SHORT,
-      IntlDateFormatter::SHORT,
-      $date->getTimezone()->getName(),
-      IntlDateFormatter::GREGORIAN,
-      'yyyy|LLL|dd|EEEEEE'
-    );
-    $parts = explode('|', $formatter->format($date));
+    $parts = explode('|', $this->formatDate($date, 'yyyy|LLL|dd|EEEEEE'));
     $parts[1] = mb_strtoupper(mb_substr($parts[1], 0, 1)) . mb_substr($parts[1], 1);
     return [
       new Cell($parts[0], ['year']),
@@ -357,28 +393,10 @@ class TaskPublish extends Task {
     ];
   }
 
-  /**
-   * @param $name
-   * @return string|null
-   */
-  protected function uniqueName($name) {
-    if (!in_array($name, $this->namesSeen)) {
-      $this->namesSeen[] = $name;
-      return $name;
-    }
-    else {
-      $i = 1;
-      $new_name = NULL;
-      while (TRUE) {
-        $i++;
-        $new_name = $name . "($i)";
-        if (!in_array($new_name, $this->namesSeen)) {
-          $this->namesSeen[] = $new_name;
-          return $new_name;
-        }
-      }
-      return NULL;
-    }
+  protected function isCheckpoint($date) {
+    $checkpoint = $this->options['checkpoint'];
+    $day_of_week = $this->formatDate($date, 'e');
+    return $day_of_week == $checkpoint;
   }
 
   /**
@@ -391,6 +409,7 @@ class TaskPublish extends Task {
   protected function buildView($period, $activities, $students) {
     $start_date = new DateTimeImmutable($period[0]);
     $end_date = new DateTimeImmutable($period[1]);
+
     $interval = $start_date->diff($end_date)->days;
 
     // Get dates array
@@ -400,31 +419,75 @@ class TaskPublish extends Task {
       $dates[] = $start_date->add(new DateInterval('P' . $offset . 'D'))->setTime(0, 0);
     }
 
+    // Calculate checkpoint totals
+    $last_checkpoint_results = [];
+    $checkpoint_totals_all = [];
+    $checkpoint_totals = [];
+    $checkpoint_id = 0;
+    foreach ($dates as $date) {
+      $timestamp = $date->getTimestamp();
+      foreach (array_keys($students) as $student_id) {
+        if (!array_key_exists($student_id, $checkpoint_totals)) {
+          $checkpoint_totals[$student_id] = 0;
+        }
+        if (array_key_exists($timestamp, $activities) && array_key_exists($student_id, $activities[$timestamp])) {
+          $checkpoint_totals[$student_id] += $activities[$timestamp][$student_id];
+        }
+      }
+      if ($this->isCheckpoint($date)) {
+        $checkpoint_totals_all[$checkpoint_id++] = $checkpoint_totals;
+        $last_checkpoint_results = $checkpoint_totals;
+        $checkpoint_totals = [];
+      }
+    }
+    $checkpoint_id_max = $checkpoint_id - 1;
+
+    // Sort students
+    $students_sorted = $students;
+    switch ($this->sort) {
+      case 'name':
+        $coll = collator_create($this->options['config']['publish']['locale']);
+        uasort($students_sorted, function($a, $b) use ($coll) {
+          return collator_compare($coll, $a['last_name'].$a['first_name'], $b['last_name'].$b['first_name']);
+        });
+        break;
+      case 'total':
+        uasort($students_sorted, function($a, $b) {
+          return $b['total'] - $a['total'];
+        });
+        break;
+      case 'checkpoint':
+        arsort($last_checkpoint_results);
+        $students_sorted = array_replace($last_checkpoint_results, $students);
+        break;
+    }
+
     // Build TOP table header
     $header_top_cols = [];
+    $checkpoint_id = 0;
     foreach ($dates as $date) {
-      $header_top_cols[] = $this->datePartCells($date);
+      $parts = $this->datePartCells($date);
+      $header_top_cols[] = $parts;
+      if ($this->isCheckpoint($date)) {
+        $checkpoint_classes = ['checkpoint'];
+        if ($checkpoint_id == $checkpoint_id_max) {
+          $checkpoint_classes[] = 'last-checkpoint';
+        }
+        $parts[2] = new Cell("", $checkpoint_classes);
+        $parts[3] = new Cell("Σ", $checkpoint_classes);
+        $header_top_cols[] = $parts;
+      }
     }
     $header_top = $this->transpose($header_top_cols);
-
-    // Build LEFT table header
-    $header_left_rows = [];
-    foreach ($students as $student_id => $student_info) {
-      $header_left_rows[] = [
-        new Cell($this->uniqueName($this->obfuscateName($student_info['first_name'], $student_info['last_name'])), ['name']),
-        new Cell($student_info['total'], ['total']),
-      ];
-    }
-    $header_left_cols = $this->transpose($header_left_rows);
-    $header_left = $header_left_rows;
 
     // Build table body
     $body_cols = [];
     $offset = 0;
+    $checkpoint_id = 0;
     foreach ($dates as $date) {
       $timestamp = $date->getTimestamp();
       $row = [];
-      foreach (array_keys($students) as $student_id) {
+      foreach (array_keys($students_sorted) as $student_id) {
         $classes = $this->isWeekend($date) ? ['weekend'] : [];
         if (array_key_exists($timestamp, $activities) && array_key_exists($student_id, $activities[$timestamp])) {
           $row[] = new Cell($activities[$timestamp][$student_id], $classes);
@@ -435,8 +498,32 @@ class TaskPublish extends Task {
         $offset++;
       }
       $body_cols[] = $row;
+      // Add checkpoints row
+      if ($this->isCheckpoint($date)) {
+        $checkpoints_row = [];
+        $checkpoint_classes = ['checkpoint'];
+        if ($checkpoint_id == $checkpoint_id_max) {
+          $checkpoint_classes[] = 'last-checkpoint';
+        }
+        foreach (array_keys($students_sorted) as $student_id) {
+          $checkpoints_row[] = new Cell($checkpoint_totals_all[$checkpoint_id][$student_id], $checkpoint_classes);
+        }
+        $checkpoint_id++;
+        $body_cols[] = $checkpoints_row;
+      }
     }
     $body = $this->transpose($body_cols);
+
+    // Build LEFT table header
+    $header_left_rows = [];
+    foreach ($students_sorted as $student_id => $student_info) {
+      $header_left_rows[] = [
+        new Cell($this->uniqueName($this->obfuscateName($student_info['first_name'], $student_info['last_name'])), ['name']),
+        new Cell($student_info['total'], ['total']),
+      ];
+    }
+    $header_left_cols = $this->transpose($header_left_rows);
+    $header_left = $header_left_rows;
 
     return [
       'header_top' => [
@@ -466,6 +553,31 @@ class TaskPublish extends Task {
 //    $c = mb_substr($first_name, 0, 1);
 //    return vsprintf('%s—%s %s.', [$a, $b, $c]);
   }
+
+  /**
+   * @param $name
+   * @return string|null
+   */
+  protected function uniqueName($name) {
+    if (!in_array($name, $this->namesSeen)) {
+      $this->namesSeen[] = $name;
+      return $name;
+    }
+    else {
+      $i = 1;
+      $new_name = NULL;
+      while (TRUE) {
+        $i++;
+        $new_name = $name . "($i)";
+        if (!in_array($new_name, $this->namesSeen)) {
+          $this->namesSeen[] = $new_name;
+          return $new_name;
+        }
+      }
+      return NULL;
+    }
+  }
+
 
   protected function transpose($array) {
     return array_map(null, ...$array);

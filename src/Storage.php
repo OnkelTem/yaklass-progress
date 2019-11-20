@@ -57,7 +57,6 @@ class Storage {
    * @throws Exception
    */
   function save($data) {
-    $current_date = new DateTime();
     $students = $this->group($this->prepare($data));
     $counters = [
       'new' => 0,
@@ -98,7 +97,7 @@ class Storage {
         $this->db->getConnection()->insert(self::TABLE_ACTIVITY, [
           'student_id' => $student_id,
           'points' => $points_diff,
-          'date' => $current_date,
+          'date' => $student['date'],
         ], [
           PDO::PARAM_INT,
           PDO::PARAM_INT,
@@ -116,9 +115,11 @@ class Storage {
 
   /**
    * Displays data from DB
+   * @param bool $ignore_empty
+   * @return array
    * @throws Exception
    */
-  public function get() {
+  public function get($ignore_empty = FALSE) {
     $studentSelect = $this->db->getConnection()->createQueryBuilder()
       ->select('student_id', 'uuid', 'first_name', 'last_name')
       ->from(self::TABLE_STUDENT);
@@ -130,7 +131,7 @@ class Storage {
     if ($students === FALSE) {
       throw new Exception("Can't select students data.");
     }
-    if (!count($students)) {
+    if (!count($students) && !$ignore_empty) {
       throw new Exception("Database is empty. Run `sync` first.");
     }
     $result = [];
@@ -158,10 +159,11 @@ class Storage {
       $full_name = $this->parseName($row['name']);
       unset($row['name']);
       $result[] = [
-        'id' => $row['id'],
+        'uuid' => $row['uuid'],
         'first_name' => $full_name[0],
         'last_name' => $full_name[1],
         'points' => $row['points'],
+        'date' => $row['date']
       ];
     }
     return $result;
@@ -170,8 +172,8 @@ class Storage {
   protected function group($users) {
     $result = [];
     foreach ($users as $user) {
-      $id = array_shift($user);
-      $result[$id] = $user;
+      $uuid = array_shift($user);
+      $result[$uuid] = $user;
     };
     return $result;
   }

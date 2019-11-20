@@ -43,11 +43,12 @@ $ vendor/bin/yaklass-ts-install.sh
 
 ### List of tasks
 
-There are currently three tasks you can run with the script:
+There are currently 4 tasks that you can perform with this script:
 
-* `sync` - fetching data from Yaklass
-* `list` - printing data currently stored in the database in JSON
-* `publish` - publishing data in a Google Spreadsheet
+* `sync` - fetching data from Yaklass and store them in the local SQLite database;
+* `list` - printing the contents of the database in JSON format;
+* `publish` - publishing the data in a Google Spreadsheet;
+* `testload` - generating random sample data.   
 
 ### Task `sync`
 
@@ -78,11 +79,17 @@ Now launch the `sync` command:
 $ vendor/bin/yaklass-ts sync
 ```
 
+It will open the browser, then follow to Yaklass website, login using your 
+credentials, open the TOP statistics page, parse it, extract the data
+and save it to the database. 
+
 When running for the first time, it creates a new SQLite database in the 
 project root - `stats.sqlite` and populates it with the fetched data.
 
 With the subsequent runs `sync` will be updating the database 
 with the new information about students activities, if there were any.
+
+To hide the browser UI and run it in the background use `--headless` option.
 
 ### Task `list`
  
@@ -101,7 +108,7 @@ which supports SQLite 3 databases.
 
 ### Task `publish`
 
-You can export the data in a Google Spreadsheet.
+This command exports the data in a Google Spreadsheet. 
 
 To do this, you first need to acquire a **Google Sheets API Service Account** credentials
 and share a specific spreadsheet with that account.
@@ -141,9 +148,29 @@ Now you should be ready to publish the data:
 $ vendor/bin/yaklass-ts publish
 ```
 
-Here is an image of how it may look:
+Here is an example of how it may look:
 
 ![Spreadsheet](https://i.gyazo.com/7981dc63897ed0a68291d315b5dd1f82.png)
+
+The table is organized visually by years, months, weeks and days.
+It's also grouped by weeks to show students results in these periods. 
+
+By default the checkpoints are assigned to the 7th day of the week, but you can change this
+with the `--checkpoint` option. For instance:
+
+```
+$ vendor/bin/yaklass-ts publish --checkpoint=2
+```
+
+would move the checkpoints to Mondays in English locales.
+
+The table is sorted by either:
+
+* `name` - student's names;
+* `total` - total amount of points;
+* `checkpoint` - latest checkpoint's results,
+
+and is selected by the `--sort=FIELD` option.
 
 ## Database structure
 

@@ -2,6 +2,7 @@
 
 namespace Yaklass;
 
+use DateTime;
 use Exception;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\TimeOutException;
@@ -45,15 +46,17 @@ class TaskSync extends Task {
     //
     // Parse data with XPath
     //
+    $current_date = new DateTime();
     $stats = [];
     try {
       $xph = new XpathHelper($html);
       $students = $xph->getList("//div[@class='classmates-top']//div[@class='top-list']/div");
       foreach ($students as $i => $student) {
         $stats[] = [
-          'id' => preg_replace('~/profile/~', '', $xph->getAttr("div[@class='name']/a/@href", $student)),
+          'uuid' => preg_replace('~/profile/~', '', $xph->getAttr("div[@class='name']/a/@href", $student)),
           'name' => $xph->getText("div[@class='name']/a", $student),
           'points' => $xph->getText("div[@class='points']", $student),
+          'date' => $current_date,
         ];
       }
     } catch (Exception $e) {
