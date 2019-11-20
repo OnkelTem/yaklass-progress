@@ -4,10 +4,12 @@
 
 ## Description
 
-Simple PHP script for fetching students TOP data from [Yaklass](https://yaklass.ru).
+This is a tool for fetching and publishing students TOP data from [Yaklass](https://yaklass.ru).
 
 The result is saved into [SQLite](https://sqlite.org/index.html) database. 
 Subsequent invocations will update the database with incremental updates.
+
+Now you can also publish the results in a Google Spreadsheet. 
 
 ## Why?
 
