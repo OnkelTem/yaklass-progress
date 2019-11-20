@@ -150,7 +150,7 @@ $ vendor/bin/yaklass-ts publish
 
 Here is an example of how it may look:
 
-![Spreadsheet](https://i.gyazo.com/7981dc63897ed0a68291d315b5dd1f82.png)
+![Spreadsheet](https://i.gyazo.com/64b3d4f5add227358541ff37f1b096c8.png)
 
 The table is organized visually by years, months, weeks and days.
 It's also grouped by weeks to show students results in these periods. 
