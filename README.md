@@ -1,4 +1,4 @@
-# Yaklass Stats
+# Yaklass Progress
 
 * Switch to the russian version: [README.ru.md](README.ru.md)
 
