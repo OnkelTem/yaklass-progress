@@ -2,7 +2,6 @@
 <?php
 
 if (file_exists("vendor/autoload.php")) {
-  /** @noinspection PhpIncludeInspection */
   require "vendor/autoload.php";
 }
 else {

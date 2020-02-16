@@ -29,8 +29,7 @@ In order to use this package you need to install [Composer](https://getcomposer.
 Install this package and its dependencies:
 
 ```
-$ composer init --no-interaction -s dev --repository '{"type": "git", "url": "git@github.com:OnkelTem/yaklass-top-sql.git"}'
-$ composer require onkeltem/yaklass-top-sql
+$ composer require onkeltem/yaklass-progress
 ```
 
 Install [Selenium](http://selenium-release.storage.googleapis.com/index.html) server 
@@ -38,7 +37,7 @@ and [Chromedriver](https://sites.google.com/a/chromium.org/chromedriver/download
 the provided install script:
 
 ```
-$ vendor/bin/yaklass-ts-install.sh
+$ vendor/bin/yaklass-progress-install.sh
 ```
 
 ## Usage
@@ -50,7 +49,7 @@ There are currently 4 tasks that you can perform with this script:
 * `sync` - fetching data from Yaklass and store them in the local SQLite database;
 * `list` - printing the contents of the database in JSON format;
 * `publish` - publishing the data in a Google Spreadsheet;
-* `testload` - generating random sample data.   
+* `test-load` - generating random sample data.
 
 ### Task `sync`
 
@@ -70,7 +69,7 @@ You need to have at least one kid configured in Yaklass to access TOP page infor
 Run the Selenium server either manually or using the provided script:
 
 ```
-$ vendor/bin/yaklass-ts-start.sh
+$ vendor/bin/yaklass-progress-start.sh
 ```
 
 The script adds a delay of 10 seconds so please wait until it returns.
@@ -78,7 +77,7 @@ The script adds a delay of 10 seconds so please wait until it returns.
 Now launch the `sync` command:
 
 ```
-$ vendor/bin/yaklass-ts sync
+$ vendor/bin/yaklass-progress sync
 ```
 
 It will open the browser, then follow to Yaklass website, login using your 
@@ -86,7 +85,7 @@ credentials, open the TOP statistics page, parse it, extract the data
 and save it to the database. 
 
 When running for the first time, it creates a new SQLite database in the 
-project root - `stats.sqlite` and populates it with the fetched data.
+project root - `progress.sqlite` and populates it with the fetched data.
 
 With the subsequent runs `sync` will be updating the database 
 with the new information about students activities, if there were any.
@@ -94,11 +93,11 @@ with the new information about students activities, if there were any.
 To hide the browser UI and run it in the background use `--headless` option.
 
 ### Task `list`
- 
+
 To list the data currently stored in the DB use `list` command:
 
 ```
-$ vendor/bin/yaklass-ts list
+$ vendor/bin/yaklass-progress list
 ```
 
 It will prints the data in JSON format, allowing for further processing (e.g. with 
@@ -119,7 +118,7 @@ To get the credentials:
 
 * Go to your [Google Developer Console](https://console.developers.google.com/)
 * Click `+ ENABLE APIS AND SERVICES` button and search for "Google Sheets API"
-* On the API's page enable proceed to craete Credentials of the type "Service Account".
+* On the API's page enable proceed to create Credentials of the type "Service Account".
 
 When you're done, you should get an email-like address and a JSON file with the credentials.
 Download that file and place it in the project root. It's name is random and may look 
@@ -147,7 +146,7 @@ and edit it accordingly to suit your conditions.
 Now you should be ready to publish the data:
 
 ```
-$ vendor/bin/yaklass-ts publish
+$ vendor/bin/yaklass-progress publish
 ```
 
 Here is an example of how it may look:
@@ -161,7 +160,7 @@ By default the checkpoints are assigned to the 7th day of the week, but you can 
 with the `--checkpoint` option. For instance:
 
 ```
-$ vendor/bin/yaklass-ts publish --checkpoint=2
+$ vendor/bin/yaklass-progress publish --checkpoint=2
 ```
 
 would move the checkpoints to Mondays in English locales.
@@ -173,6 +172,17 @@ The table is sorted by either:
 * `checkpoint` - latest checkpoint's results,
 
 and is selected by the `--sort=FIELD` option.
+
+### Task `test-load`
+
+Populates the database with a random data. E.g.
+
+```
+$ vendor/bin/yaklass-progress test-load
+```
+
+will create few students and their activities. The generation period equals to 50 days before now,
+but can be changed using `--start=DATE` option. The primary 
 
 ## Database structure
 
@@ -192,8 +202,8 @@ probably want to run it regularly. One way to achieve that is via cron.
 For example, run `crontab -e` and add these lines:
 
 ```
-0/10 * * * * cd /path/to/project && ./vendor/bin/yaklass-ts-start.sh && ./vendor/bin/yaklass-ts --headless sync >> cron.log 2>&1; ./vendor/bin/yaklass-ts-stop.sh
-0/20 * * * * cd /path/to/project && ./vendor/bin/yaklass-ts publish >> cron.log 2>&1
+0/10 * * * * cd /path/to/project && ./vendor/bin/yaklass-progress-start.sh && ./vendor/bin/yaklass-progress --headless sync >> cron.log 2>&1; ./vendor/bin/yaklass-progress-stop.sh
+0/20 * * * * cd /path/to/project && ./vendor/bin/yaklass-progress publish >> cron.log 2>&1
 ```
 
 The first line instructs cron to run hourly:

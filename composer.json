@@ -1,6 +1,6 @@
 {
-  "name": "onkeltem/yaklass-top-sql",
-  "description": "Yaklass TOP-page data SQL fetcher",
+  "name": "onkeltem/yaklass-progress",
+  "description": "Yaklass progress data fetcher and analyser",
   "license": "LGPL-3.0-or-later",
   "authors": [
     {
@@ -13,9 +13,9 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "facebook/webdriver": "^1.7.1",
+    "php-webdriver/webdriver": "^1.7.1",
     "league/csv": "^9.4",
-    "onkeltem/task-runner": "dev-master",
+    "datamincer/task-runner": "^0.0.5",
     "google/apiclient": "^2.0",
     "doctrine/dbal": "^2.9",
     "psr/log": "^1.0.1",
@@ -27,10 +27,10 @@
     "ext-mbstring": "*"
   },
   "bin": [
-    "bin/yaklass-ts",
-    "bin/yaklass-ts-install.sh",
-    "bin/yaklass-ts-start.sh",
-    "bin/yaklass-ts-stop.sh"
+    "bin/yaklass-progress",
+    "bin/yaklass-progress-install.sh",
+    "bin/yaklass-progress-start.sh",
+    "bin/yaklass-progress-stop.sh"
   ],
   "autoload": {
     "psr-4": {

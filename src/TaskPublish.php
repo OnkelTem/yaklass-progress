@@ -46,7 +46,7 @@ class TaskPublish extends Task {
     try {
       $storage = new Storage([
         'driver' => 'pdo_sqlite',
-        'path' => 'stats.sqlite',
+        'path' => $this->options['db'],
       ], $this->logger);
       $period = $storage->getPeriod();
       $students = $storage->getStudentsWithTotals();
@@ -104,7 +104,7 @@ class TaskPublish extends Task {
           $gsh->queueUpdate($gsh->requestMerge($sheet_title, $i, $c, $i, $c + $count - 1));
           $c += $count;
         }
-      };
+      }
       $table[] = $cols;
     }
     for ($n = 0; $n < $view['body']['rows']; $n++) {
@@ -201,8 +201,10 @@ class TaskPublish extends Task {
    * @param GoogleSheetsHelper $gsh
    */
   protected function addFormatByClass($sheet_title, $class, $format, $clusters, $gsh) {
-    foreach ($clusters[$class] as $cluster) {
-      $gsh->queueUpdate($gsh->requestFormat($sheet_title, $format, $cluster));
+    if (array_key_exists($class, $clusters)) {
+      foreach ($clusters[$class] as $cluster) {
+        $gsh->queueUpdate($gsh->requestFormat($sheet_title, $format, $cluster));
+      }
     }
   }
 
@@ -578,9 +580,15 @@ class TaskPublish extends Task {
     }
   }
 
-
   protected function transpose($array) {
-    return array_map(null, ...$array);
+    $retData = array();
+
+    foreach ($array as $row => $columns) {
+      foreach ($columns as $row2 => $column2) {
+        $retData[$row2][$row] = $column2;
+      }
+    }
+    return $retData;
   }
 }
 

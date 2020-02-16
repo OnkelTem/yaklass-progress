@@ -1,13 +1,13 @@
-# Yaklass TOP - SQL fetcher
+# Yaklass Progress
 
-## Description
+## Что это?
 
 Скрипт для скачивания рейтинга учеников со страницы ТОП в ЯКласс и публикации
 его в Google Spreadsheets.
 
 Выгрузка сохраняется в БД SQLite. Последующие запуски будут обновлять базу инкрементами.
 
-## Why
+## Зачем?
 
 Ну, возможно, вы зачем-то захотите собирать статистику по прогрессу всего класса,
 где учится ваш ребёнок.
@@ -16,17 +16,16 @@
 у детей была дополнительная мотивация на закрепление пройденного материала.
 Ведь повторение - мать учения, как изввестно.
 
-## Prerequisites
+## Зависимости
 
 Чтобы использовать этот софт, установите [Composer](https://getcomposer.org/).
 
-## Setup
+## Установка
 
 Установить пакет и его зависимости:
 
 ```
-$ composer init --no-interaction -s dev --repository '{"type": "git", "url": "git@github.com:OnkelTem/yaklass-top-sql.git"}'
-$ composer require onkeltem/yaklass-top-sql
+$ composer onkeltem/yaklass-progress
 ```
 
 Установите сервер [Selenium](http://selenium-release.storage.googleapis.com/index.html)
@@ -34,20 +33,21 @@ $ composer require onkeltem/yaklass-top-sql
 либо запустив прилагающийся скрипт:
 
 ```
-$ vendor/bin/yaklass-ts-install.sh
+$ vendor/bin/yaklass-progress-install.sh
 ```
 
-## Usage
+## Использование
 
-### List of tasks
+### Список команд
 
 Скрипт выполняет 3 команды:
 
 * `sync` - забрать данные с ЯКласс
 * `list` - вывести данные из БД в JSON
 * `publish` - опубликовать данные в Google Spreadsheet
+* `testload` - генерация случайных тестовых данных.
 
-### Task `sync`
+### Команда `sync`
 
 В корне создайте файл `credentials.json` со следующим содержимым:
 
@@ -65,7 +65,7 @@ $ vendor/bin/yaklass-ts-install.sh
 Запустите сервис **Selenium**, либо вручную, либо прилагающися скриптом:
 
 ```
-$ vendor/bin/yaklass-ts-start.sh
+$ vendor/bin/yaklass-progress-start.sh
 ```
 
 У скрипта есть задержка в 10 секунд, так что просто подождите, когда он запустит сервис в фоне и закончит работать.
@@ -73,21 +73,21 @@ $ vendor/bin/yaklass-ts-start.sh
 Выполните команду `sync`:
 
 ```
-$ vendor/bin/yaklass-ts sync
+$ vendor/bin/yaklass-progress sync
 ```
 
 При первом запуске в корне проекта будет создана и заполнена выгруженными данными база данных
-SQLite - `stats.sqlite` .
+SQLite - `progress.sqlite` .
 
 Последующие запуски `sync` будут обновлять базу *новой информацией* об активности
 детишек, если таковая имела место быть (за период с последнего запуска `sync`). 
 
-### Task `list`
+### Команда `list`
 
 Чтобы посмотреть данные в базе, выполните команду `list`:
 
 ```
-$ vendor/bin/yaklass-ts list
+$ vendor/bin/yaklass-progress list
 ```
 
 Будет выведен список в формате JSON, который можно уже дальше расковыривать с помощью
@@ -97,7 +97,7 @@ $ vendor/bin/yaklass-ts list
 [SQLite Database Browser](https://sqlitebrowser.org/) или любой другой аналогичной
 тулзы для SQLite 3.
 
-### Task `publish`
+### Команда `publish`
 
 С помощью данной команды данные из БД публикуются в выбранном вами Google Spreadsheet.
 
@@ -133,7 +133,7 @@ $ vendor/bin/yaklass-ts list
 Отредактируйте значения в соответствии с вашей ситуацией и вы готовы к запуску публикации:
 
 ```
-$ vendor/bin/yaklass-ts publish
+$ vendor/bin/yaklass-progress publish
 ```
 
 Выглядит результат примерно так:
@@ -148,7 +148,7 @@ $ vendor/bin/yaklass-ts publish
 но вы можете изменить этот день с помощью опции `--checkpoint`. Например:
 
 ```
-$ vendor/bin/yaklass-ts publish --checkpoint=1
+$ vendor/bin/yaklass-progress publish --checkpoint=1
 ```
 
 сдвинет подведение промежуточных итогов на понедельник.
@@ -161,8 +161,7 @@ $ vendor/bin/yaklass-ts publish --checkpoint=1
 
 Выбор режима сортировки производится опцией `--sort=FIELD`.
 
-
-## Database
+## Структура БД
 
 В базе 2 таблицы: `student` and `activity`.
 
@@ -170,7 +169,7 @@ $ vendor/bin/yaklass-ts publish --checkpoint=1
 
 В таблице `activity` хранится информация об активности обучающихся.
 
-## Workflow
+## Воркфлоу
 
 Поскольку основное назначение скрипта - периодически обновлять базу, нужно
 запускать скрипт регулярно, с чем легко справится тот же крон.
@@ -178,8 +177,8 @@ $ vendor/bin/yaklass-ts publish --checkpoint=1
 Например, запустить `crontab -e` и добавьте 'nb строки:
  
 ```
-0/10 * * * * cd /path/to/project && ./vendor/bin/yaklass-ts-start.sh && ./vendor/bin/yaklass-ts --headless sync >> cron.log 2>&1; ./vendor/bin/yaklass-ts-stop.sh
-0/20 * * * * cd /path/to/project && ./vendor/bin/yaklass-ts publish >> cron.log 2>&1
+0/10 * * * * cd /path/to/project && ./vendor/bin/yaklass-progress-start.sh && ./vendor/bin/yaklass-progress --headless sync >> cron.log 2>&1; ./vendor/bin/yaklass-progress-stop.sh
+0/20 * * * * cd /path/to/project && ./vendor/bin/yaklass-progress publish >> cron.log 2>&1
 ```
 
 Первая строка инструктирует крон каждый час:
@@ -197,8 +196,6 @@ $ vendor/bin/yaklass-ts publish --checkpoint=1
 * ~~Добавить `headless` режим для PHP WebDriver.~~
 * ~~Добавить возможность получать отчеты (например в CSV)~~
 
-## Contact
+## Контакты
 
 Идеи, предложения? Добро пожаловать в **Issues**. Или пишите, обсудим: aneganov@gmail.com.
-
-

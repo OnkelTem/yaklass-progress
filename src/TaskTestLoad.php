@@ -4,7 +4,6 @@ namespace Yaklass;
 
 use DateInterval;
 use DateTime;
-use DateTimeImmutable;
 use Exception;
 use TaskRunner\Task;
 use TaskRunner\TaskRunnerException;
@@ -14,7 +13,7 @@ use TaskRunner\TaskRunnerException;
  */
 class TaskTestLoad extends Task {
 
-  protected static $taskId = 'testload';
+  protected static $taskId = 'test-load';
 
   const FIRST_NAMES_MALE = [
     'Александр',
@@ -127,7 +126,7 @@ class TaskTestLoad extends Task {
     try {
       $storage = new Storage([
         'driver' => 'pdo_sqlite',
-        'path' => 'stats.sqlite',
+        'path' => $this->options['db'],
       ], $this->logger);
 
       // Check for existing data

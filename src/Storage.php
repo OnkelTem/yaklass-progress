@@ -42,7 +42,7 @@ class Storage {
           'activity_id' => ['type' => 'integer', 'autoinc' => 1],
           'student_id' => ['type' => 'integer'],
           'points' => ['type' => 'integer'],
-          'date' => ['type' => 'datetime'],
+          'date' => ['type' => 'string'],
         ],
         'primary' => [
           'pk' => ['activity_id'],
@@ -94,14 +94,16 @@ class Storage {
       $points = intval($activityTotalSelect->setParameter(0, $student_id)->execute()->fetchColumn(0));
       if ($points != $student['points']) {
         $points_diff = $student['points'] - $points;
+        /** @var DateTime $datetime */
+        $datetime = $student['date'];
         $this->db->getConnection()->insert(self::TABLE_ACTIVITY, [
           'student_id' => $student_id,
           'points' => $points_diff,
-          'date' => $student['date'],
+          'date' => $datetime->format('Y-m-d H:i:s'),
         ], [
           PDO::PARAM_INT,
           PDO::PARAM_INT,
-          'datetime'
+          PDO::PARAM_STR,
         ]);
         $this->logger->debug("\tUpdated: " . ($points_diff >= 0 ? '+' : '-') . abs($points_diff) . " points");
         $counters['updated']++;
@@ -174,7 +176,7 @@ class Storage {
     foreach ($users as $user) {
       $uuid = array_shift($user);
       $result[$uuid] = $user;
-    };
+    }
     return $result;
   }
 
@@ -190,24 +192,24 @@ class Storage {
     return $result;
   }
 
-  /**
-   * @param array $activities
-   * @throws Exception
-   */
-  public function addActivities(array $activities) {
-    $student_id = 1;
-    foreach($activities as $activity) {
-      $this->db->getConnection()->insert(self::TABLE_ACTIVITY, [
-        'student_id' => $student_id,
-        'points' => $activity['points'],
-        'date' => $activity['date'],
-      ], [
-        PDO::PARAM_INT,
-        PDO::PARAM_INT,
-        'datetime'
-      ]);
-    }
-  }
+//  /**
+//   * @param array $activities
+//   * @throws Exception
+//   */
+//  public function addActivities(array $activities) {
+//    $student_id = 1;
+//    foreach($activities as $activity) {
+//      $this->db->getConnection()->insert(self::TABLE_ACTIVITY, [
+//        'student_id' => $student_id,
+//        'points' => $activity['points'],
+//        'date' => $activity['date'],
+//      ], [
+//        PDO::PARAM_INT,
+//        PDO::PARAM_INT,
+//        'datetime'
+//      ]);
+//    }
+//  }
 
   /**
    * @throws Exception

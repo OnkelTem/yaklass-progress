@@ -69,7 +69,7 @@ class TaskSync extends Task {
     try {
       $storage = new Storage([
         'driver' => 'pdo_sqlite',
-        'path' => 'stats.sqlite',
+        'path' => $this->options['db'],
       ], $this->logger);
       $storage->save($stats);
     } catch (Exception $e) {

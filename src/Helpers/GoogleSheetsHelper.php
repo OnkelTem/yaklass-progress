@@ -273,8 +273,8 @@ class GoogleSheetsHelper {
     return $result;
   }
 
-  public function getColor($hexstr) {
-    $str = substr($hexstr, 1);
+  public function getColor($hex_str) {
+    $str = substr($hex_str, 1);
     $code = hexdec($str);
     $b = $code % 256;
     $code = $code >> 8;

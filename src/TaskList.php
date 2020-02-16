@@ -20,7 +20,7 @@ class TaskList extends Task {
     try {
       $storage = new Storage([
         'driver' => 'pdo_sqlite',
-        'path' => 'stats.sqlite',
+        'path' => 'progress.sqlite',
       ], $this->logger);
       $data = $storage->get();
       foreach($data as $row) {

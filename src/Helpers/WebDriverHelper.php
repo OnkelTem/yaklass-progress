@@ -2,6 +2,8 @@
 
 namespace Yaklass\Helpers;
 
+use Exception;
+use Facebook\WebDriver\Exception\WebDriverCurlException;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Chrome\ChromeOptions;
@@ -16,6 +18,7 @@ class WebDriverHelper {
   /**
    * Yaklass Spider constructor.
    * @param bool $headless
+   * @throws Exception
    */
   function __construct($headless = FALSE) {
     $this->runBrowser($headless);
@@ -27,6 +30,7 @@ class WebDriverHelper {
 
   /**
    * @param $headless
+   * @throws Exception
    */
   function runBrowser($headless) {
     $options = new ChromeOptions();
@@ -34,9 +38,17 @@ class WebDriverHelper {
       $options->addArguments(['headless']);
     }
     $capabilities = DesiredCapabilities::chrome();
-    /** @noinspection PhpDeprecationInspection */
     $capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
-    $this->driver = RemoteWebDriver::create(self::CONNECT_LINE, $capabilities);
+    try {
+      $this->driver = RemoteWebDriver::create(self::CONNECT_LINE, $capabilities);
+    }
+    /** @noinspection PhpRedundantCatchClauseInspection */
+    catch (WebDriverCurlException $e) {
+      $msg = $e->getMessage();
+      if (strpos($msg, 'Failed to connect') !== 0) {
+        throw new Exception($msg . "\n\n" . "Make sure Selenium is running.");
+      }
+    }
     //$this->driver->manage()->window()->maximize();
   }
 
